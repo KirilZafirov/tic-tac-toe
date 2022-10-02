@@ -14,14 +14,20 @@ import { tap } from 'rxjs';
 export class AppComponent {
 
   public readonly board$ = this.gameService.board$.pipe(
-    tap( board => this.showStatistics = board.length > 1)
+    tap( board => {
+      this.showStatistics = board.length > 1 
+      console.log(board)
+    })
   );
   public readonly gameState$ = this.gameService.gameState$;
   public readonly availablePlayerOneSigns$ = this.gameService.availablePlayerOneSigns$;
   public readonly availablePlayerTwoSigns$ = this.gameService.availablePlayerTwoSigns$;
   public readonly availableAvatars$ = this.gameService.availableAvatars$;
-  public readonly aiDifficulties = this.aiMoveService.availableAiDifficulties;
+  public readonly memoState = this.gameService.memoState; 
+  public readonly aiDifficulties = this.aiMoveService.availableAiDifficulties; 
+
   public showStatistics: boolean =  false;
+ 
   constructor(private gameService: GameService,
     private aiMoveService: AiMoveService,
     private localStorageService: LocalStorageService) { }
@@ -76,5 +82,13 @@ export class AppComponent {
 
   public playerTwoGoesFirst(): void {
     this.gameService.updateGameState({ activePlayerOne: false });
+  }
+
+  public undo():void {
+    this.gameService.undo();
+  }
+
+  public redo(): void {
+    this.gameService.redo();
   }
 }

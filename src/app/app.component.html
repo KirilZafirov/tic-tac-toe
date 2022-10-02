@@ -19,8 +19,7 @@
           </button>
           <button class="game__type" [disabled]="gameState.gameStarted" (click)="selectGameType(true)">
             Multi Player
-          </button>
-
+          </button> 
 
         </div>
         <div class="game__settings">
@@ -67,6 +66,9 @@
       <h3>{{ gameState.tableState }}</h3>
 
       <div class="game__options ">
+        <!-- <button (click)="undo()" class="game__start" [disabled]="!(memoState.totalMemos > 1 && memoState.currentMemo > 1)">Undo</button>
+          <button (click)="redo()" class="game__start" [disabled]="!(memoState.totalMemos > 1 && memoState.currentMemo < memoState.totalMemos)">Redo</button> --> 
+
         <button (click)="startGame()" [disabled]="gameState.multiplayer === null" class="game__start">New Game</button>
         <button (click)="reset()" class="game__start">Reset Settings And Score</button>
         <button (click)="playerTwoGoesFirst()" class="game__start" [disabled]="gameState.gameStarted">Player Two goes

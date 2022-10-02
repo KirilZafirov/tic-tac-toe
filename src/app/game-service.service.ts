@@ -4,6 +4,7 @@ import { AiMoveService } from './ai-move.service';
 import { LocalStorageService } from './core/local-storage/local-storage.service';
 import { AVATARS } from './core/models/avatars.model';
 import { GameState, GAME_STATE } from './core/models/game-state.model';
+import { MemoGameState } from './core/models/memo.model';
 import { SquarePosition } from './core/models/square.model';
 
 const INITIAL_STATE = {
@@ -35,12 +36,18 @@ export class GameService {
   public readonly availablePlayerOneSigns$: Observable<string[]>;
   public readonly availablePlayerTwoSigns$: Observable<string[]>;
   public readonly availableAvatars$: Observable<string[]>; 
-
+  public memoState: MemoGameState= {
+    state: [],
+    totalMemos: 0,
+    currentMemo: 0
+  };
+  
   private board$$ = new BehaviorSubject<string[][]>([]); 
   private gameState$$: BehaviorSubject<GameState>;
   private availablePlayerSigns$$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>(['X', 'O', 'J', 'M']);
   private availableAvatars$$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>(AVATARS);
   
+ 
 
   constructor(private readonly localStorageService: LocalStorageService , private aiMoveService: AiMoveService) { 
     this.gameState$$ = new BehaviorSubject<GameState>(localStorageService.getItem(GAME_STATE) || INITIAL_STATE);
@@ -79,8 +86,10 @@ export class GameService {
     };
 
     this.gameState$$.next(newState);
-    this.localStorageService.setItem(GAME_STATE , newState);
-  };
+    this.localStorageService.setItem(GAME_STATE , newState);  
+    
+    this.addMemoState();
+  }; 
 
   public updateMatrix(squarePosition: SquarePosition): void {
     const state = this.board$$.getValue();
@@ -119,10 +128,12 @@ export class GameService {
     }
 
     if(activePlayerOne && !gameState.multiplayer && !gameWon && !noMoreRemainingFields) {
-      const squarePosition = this.aiMoveService.getComputerMove(this.gameState$$.getValue() , this.board$$.getValue());
-
+      const squarePosition = this.aiMoveService.getComputerMove(this.gameState$$.getValue() , this.board$$.getValue()); 
       this.updateMatrix(squarePosition);
     }
+
+    this.addMemoState();
+
   }
 
   public updateGameState(changedState: Partial<GameState>): void {
@@ -147,10 +158,43 @@ export class GameService {
     this.board$$.next(newState);
   }
  
+  public undo(): void { 
+    if(this.memoState.state.length > 1) {
+      const oldMemo =  this.memoState.state[this.memoState.currentMemo - 2];
+      if(oldMemo) {
+        this.board$$.next(oldMemo.board);
+        this.gameState$$.next(oldMemo.gameState); 
+        this.memoState.currentMemo = this.memoState.currentMemo - 1;
+      } 
+    } 
+  }
+   
+  public redo(): void {
+    if(this.memoState.state.length > 1) {
+      const newMemo =  this.memoState.state[this.memoState.currentMemo];
+      if(newMemo) {
+        this.board$$.next(newMemo.board);
+        this.gameState$$.next(newMemo.gameState); 
+        this.memoState.currentMemo = this.memoState.currentMemo + 1;
+      } 
+    } 
+  } 
+  
+
+  private addMemoState():void { 
+    this.memoState.state.push({
+      board: structuredClone(this.board$$.getValue()),
+      gameState: structuredClone(this.gameState$$.getValue()), 
+    });
+    this.memoState.totalMemos = this.memoState.state.length;
+    this.memoState.currentMemo =  this.memoState.currentMemo + 1; 
+  };
+
   public resetGame():void {
     this.gameState$$.next(INITIAL_STATE);
     this.board$$.next([])
   }
+ 
   private winConditionMatch = (squarePosition: SquarePosition, activePlayerSign: string, matrixOfM: number, state: any[][]): boolean =>
     this.horizontalMatch(state, squarePosition, activePlayerSign) ||
     this.verticalMatch(state, squarePosition, activePlayerSign) ||
