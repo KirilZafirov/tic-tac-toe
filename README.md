@@ -2,6 +2,15 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.1.1.
 
+
+![alt text](./src//assets//Game_Mood.png)
+
+
+In order to play the game you need to Select Either Single player or Multiplayer and Click on Start Game.
+
+In order to change the Game mod or to Reset the Score you would need to Click REset Settings and Score.
+
+There is LocalStorage in Place that makes sure to track your complete history score until requested to be deleted.
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
