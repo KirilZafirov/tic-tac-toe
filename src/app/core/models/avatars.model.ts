@@ -1,0 +1,1 @@
+export const AVATARS = ['old-man' , 'mustache' , 'beard' , 'man-beard' , 'woman' , 'man']

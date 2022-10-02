@@ -1,0 +1,6 @@
+<button class="square" 
+[class.square__active]="squareState || gameEnd"
+[disabled]="squareState|| gameEnd"
+(click)="onSelect()">
+  {{squareState}}
+</button>  

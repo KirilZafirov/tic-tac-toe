@@ -1,0 +1,54 @@
+<div class="player">
+  <div class="player__element">
+    Player: {{player}}
+  </div>
+
+  <div class="player__element">
+    Score: {{score}}
+  </div>
+
+  <div class="player__element">
+    Avatar:
+    <img [src]="imgSrc+playerAvatar + '.png'" />
+  </div>
+
+  <div class="player__element">
+    <input type="text" (blur)="changePlayerName(playerName.value)" #playerName [disabled]="gameEnd"
+      placeholder="Enter username" />
+  </div>
+
+  <div class="player__element">
+    <label for="marker">Choose a marker:</label>
+
+    <select name="marker" (change)="selectSign(selectPlayer.value)" #selectPlayer [disabled]="gameEnd">
+      <ng-container *ngFor="let sign of availableSigns; trackBy: trackByIndex">
+        <option [value]="sign" [selected]="sign === playerSign">{{sign}}</option>
+      </ng-container>
+    </select>
+  </div> 
+
+  <div class="player__element">
+    <label for="playerAiDifficulty">Computer Difficulty:</label>
+    <select name="playerAiDifficulty" (change)="selectDifficulty(selectDifficultyRef.value)" #selectDifficultyRef
+      [disabled]="gameEnd">
+      <ng-container *ngFor="let difficulty of aiDifficulties; trackBy: trackByIndex">
+        <option [value]="difficulty" [selected]="difficulty === selectedDifficulty">{{difficulty}}</option>
+      </ng-container>
+    </select>
+  </div>
+
+
+  <div class="player__element">
+    <label for="avatars">Choose avatar:</label>
+
+    <select name="avatars" (change)="selectAvatar(selectAvatarRef.value)" #selectAvatarRef [disabled]="gameEnd">
+      <ng-container *ngFor="let avatar of avatars; trackBy: trackByIndex">
+        <option [value]="avatar" [selected]="avatar === playerAvatar"
+          [style.background-image]="'url(./assets/avatars/' + avatar + '.png)'">
+          {{avatar}}
+        </option>
+      </ng-container>
+    </select>
+  </div>
+
+</div>

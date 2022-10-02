@@ -1,0 +1,63 @@
+:host {
+  display: block;
+  height: 100%;
+
+  padding: 45px;
+
+  &[hidden] {
+    display: none;
+  }
+
+
+
+  .header{
+    h1 {
+      text-align: center;
+    }  
+
+    &__layout {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: nowrap;
+      justify-content: space-around;
+    }
+  }
+
+
+  .game {
+    &__settings {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      height: 120px;
+    }
+
+    &__type {
+      height: 100%;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 120px;
+      margin: 0 64px;
+    }
+
+    &__start {
+      width: 100%;
+      height: 80px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 15px;
+    }
+    &__options {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      .game__start {
+        width: 30%;
+      }
+    }
+  }
+}

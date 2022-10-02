@@ -1,0 +1,8 @@
+ 
+  <ng-container *ngFor="let row of matrix; let indexRow=index;">
+    <div class="matrices-row">
+      <ng-container  *ngFor="let square of row; let indexColumn = index;">
+        <app-square  (select)="selectSquare(indexRow , indexColumn)" [squareState]="square" [gameEnd]="gameState.gameEnd"></app-square>
+      </ng-container> 
+    </div>
+  </ng-container>  

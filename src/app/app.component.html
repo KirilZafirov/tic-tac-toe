@@ -1,0 +1,78 @@
+<ng-container *ngIf="gameState$ | async as gameState">
+  <header class="header">
+    <h1> tic-tac-toe app is running!</h1>
+    <div class="header__layout">
+      <div class="header__score">
+        <app-player [player]="gameState.playerOne" [playerSign]="gameState.playerOneSign"
+          [score]="gameState.scorePlayerOne" [gameEnd]="gameState.gameEnd"
+          [availableSigns]="(availablePlayerOneSigns$ | async) || []" [playerAvatar]="gameState.playerOneAvatar"
+          [avatars]="(availableAvatars$ | async) || []" (selectPlayerAvatar)="selectAvatar($event , true)"
+          (selectPlayerSign)="selectSign($event , true)" (updatePlayerName)="changePlayerName($event, true)">
+        </app-player>
+      </div>
+
+
+      <div class="header_setttings">
+        <div class="game__settings">
+          <button class="game__type" [disabled]="gameState.gameStarted" (click)="selectGameType(false)">
+            Single Player
+          </button>
+          <button class="game__type" [disabled]="gameState.gameStarted" (click)="selectGameType(true)">
+            Multi Player
+          </button>
+
+
+        </div>
+        <div class="game__settings">
+          <button class="game__start" (click)="startGame()" [disabled]="gameState.multiplayer === null">Start
+            Game</button>
+        </div>
+      </div>
+
+
+      <div class="header__score">
+        <ng-container *ngIf="gameState.multiplayer; else singlePlayerTmplRef">
+          <app-player [player]="gameState.playerTwo" [playerSign]="gameState.playerTwoSign"
+            [score]="gameState.scorePlayerTwo" [gameEnd]="gameState.gameEnd" [playerAvatar]="gameState.playerTwoAvatar"
+            [avatars]="(availableAvatars$ | async) || []" [availableSigns]="(availablePlayerTwoSigns$ | async) || []"
+            (selectPlayerAvatar)="selectAvatar($event , false)" (selectPlayerSign)="selectSign($event , false)"
+            (updatePlayerName)="changePlayerName($event, false)">
+          </app-player>
+        </ng-container>
+
+        <ng-template #singlePlayerTmplRef>
+          <app-ai-player [player]="gameState.playerTwo" [playerSign]="gameState.playerTwoSign"
+            [score]="gameState.scorePlayerTwo" [gameEnd]="gameState.gameEnd" [playerAvatar]="gameState.playerTwoAvatar"
+            [availableSigns]="(availablePlayerTwoSigns$ | async) || []" [avatars]="(availableAvatars$ | async) || []"
+            (selectPlayerAvatar)="selectAvatar($event , false)" (selectPlayerSign)="selectSign($event , false)"
+            (updatePlayerName)="changePlayerName($event, false)" [aiDifficulties]="aiDifficulties"
+            (difficulty)="changeDifficulty($event)">
+
+          </app-ai-player>
+        </ng-template>
+      </div>
+    </div>
+  </header>
+
+
+
+  <ng-container *ngIf="board$| async as board">
+    <app-table [matrix]="board" (select)="changeState($event)" [gameState]="gameState"></app-table>
+
+    <div *ngIf="board.length > 1">
+      <h1>
+        Game State:
+      </h1>
+
+      <h3>{{ gameState.tableState }}</h3>
+
+      <div class="game__options ">
+        <button (click)="startGame()" [disabled]="gameState.multiplayer === null" class="game__start">New Game</button>
+        <button (click)="reset()" class="game__start">Reset Settings And Score</button>
+        <button (click)="playerTwoGoesFirst()" class="game__start" [disabled]="gameState.gameStarted">Player Two goes
+          First</button>
+      </div>
+    </div>
+
+  </ng-container>
+</ng-container>
