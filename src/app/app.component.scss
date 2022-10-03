@@ -23,8 +23,15 @@
       justify-content: space-around;
     }
   }
-
-
+  
+  @media screen and (max-width: 920px) {
+    .header__layout {
+      flex-direction: column;
+    }
+    .header__score {
+      width: 100%;
+    }
+  }
   .game {
     &__settings {
       display: flex;
