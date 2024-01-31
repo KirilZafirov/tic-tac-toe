@@ -5,11 +5,23 @@ import { GAME_STATE, SelectPlayerSign, UpdatePlayerName } from './core/models/ga
 import { AiMoveService } from './ai-move.service';
 import { LocalStorageService } from './core/local-storage/local-storage.service';
 import { tap } from 'rxjs';
+import { TableComponent } from './features/table/table.component';
+import { AiPlayerComponent } from './features/ai/ai-player/ai-player.component';
+import { PlayerComponent } from './features/player/player.component';
+import { NgIf, AsyncPipe } from '@angular/common';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    standalone: true,
+    imports: [
+        NgIf,
+        PlayerComponent,
+        AiPlayerComponent,
+        TableComponent,
+        AsyncPipe,
+    ],
 })
 export class AppComponent {
 
