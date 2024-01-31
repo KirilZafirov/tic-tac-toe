@@ -4,7 +4,7 @@
     <div class="header__layout">
       <div class="header__score">
         <app-player [player]="gameState.playerOne" [playerSign]="gameState.playerOneSign"
-          [score]="gameState.scorePlayerOne" [gameEnd]="gameState.gameEnd"
+          [score]="gameState.scorePlayerOne" [gameEnd]="gameState.gameEnd" [disabled]="gameState.gameStarted"
           [availableSigns]="(availablePlayerOneSigns$ | async) || []" [playerAvatar]="gameState.playerOneAvatar"
           [avatars]="(availableAvatars$ | async) || []" (selectPlayerAvatar)="selectAvatar($event , true)"
           (selectPlayerSign)="selectSign($event , true)" (updatePlayerName)="changePlayerName($event, true)">
@@ -19,7 +19,7 @@
           </button>
           <button class="game__type" [disabled]="gameState.gameStarted" (click)="selectGameType(true)">
             Multi Player
-          </button> 
+          </button>
 
         </div>
         <div class="game__settings">
@@ -41,11 +41,11 @@
 
         <ng-template #singlePlayerTmplRef>
           <app-ai-player [player]="gameState.playerTwo" [playerSign]="gameState.playerTwoSign"
-            [score]="gameState.scorePlayerTwo" [gameEnd]="gameState.gameEnd" [playerAvatar]="gameState.playerTwoAvatar"
-            [availableSigns]="(availablePlayerTwoSigns$ | async) || []" [avatars]="(availableAvatars$ | async) || []"
-            (selectPlayerAvatar)="selectAvatar($event , false)" (selectPlayerSign)="selectSign($event , false)"
-            (updatePlayerName)="changePlayerName($event, false)" [aiDifficulties]="aiDifficulties"
-            (difficulty)="changeDifficulty($event)">
+            [disabled]="gameState.gameStarted" [score]="gameState.scorePlayerTwo" [gameEnd]="gameState.gameEnd"
+            [playerAvatar]="gameState.playerTwoAvatar" [availableSigns]="(availablePlayerTwoSigns$ | async) || []"
+            [avatars]="(availableAvatars$ | async) || []" (selectPlayerAvatar)="selectAvatar($event , false)"
+            (selectPlayerSign)="selectSign($event , false)" (updatePlayerName)="changePlayerName($event, false)"
+            [aiDifficulties]="aiDifficulties" (difficulty)="changeDifficulty($event)">
 
           </app-ai-player>
         </ng-template>
@@ -64,17 +64,16 @@
       </h1>
 
       <h3>{{ gameState.tableState }}</h3>
-
-      <div class="game__options ">
-        <!-- <button (click)="undo()" class="game__start" [disabled]="!(memoState.totalMemos > 1 && memoState.currentMemo > 1)">Undo</button>
-          <button (click)="redo()" class="game__start" [disabled]="!(memoState.totalMemos > 1 && memoState.currentMemo < memoState.totalMemos)">Redo</button> --> 
-
-        <button (click)="startGame()" [disabled]="gameState.multiplayer === null" class="game__start">New Game</button>
-        <button (click)="reset()" class="game__start">Reset Settings And Score</button>
-        <button (click)="playerTwoGoesFirst()" class="game__start" [disabled]="gameState.gameStarted">Player Two goes
-          First</button>
-      </div>
     </div>
 
   </ng-container>
+  <div class="game__options ">
+    <!-- <button (click)="undo()" class="game__start" [disabled]="!(memoState.totalMemos > 1 && memoState.currentMemo > 1)">Undo</button>
+      <button (click)="redo()" class="game__start" [disabled]="!(memoState.totalMemos > 1 && memoState.currentMemo < memoState.totalMemos)">Redo</button> -->
+
+    <button (click)="startGame()" [disabled]="gameState.multiplayer === null" class="game__start">New Game</button>
+    <button (click)="reset()" class="game__start">Reset Settings And Score</button> <button
+      (click)="playerTwoGoesFirst()" class="game__start" [disabled]="gameState.gameStarted">Player Two goes
+      First</button>
+  </div>
 </ng-container>

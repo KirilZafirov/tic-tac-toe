@@ -16,7 +16,7 @@ const INITIAL_STATE = {
   playerTwoSign: 'O',
   scorePlayerOne: 0,
   scorePlayerTwo: 0,
-  
+
   activePlayerOne: true,
   selectedFields: 0,
   tableState: 'Player One turn',
@@ -24,7 +24,7 @@ const INITIAL_STATE = {
   gameStarted: false,
   multiplayer: null,
   matrixOfM: 0,
-  
+
 }
 @Injectable({
   providedIn: 'root'
@@ -35,26 +35,26 @@ export class GameService {
   public readonly gameState$: Observable<GameState>;
   public readonly availablePlayerOneSigns$: Observable<string[]>;
   public readonly availablePlayerTwoSigns$: Observable<string[]>;
-  public readonly availableAvatars$: Observable<string[]>; 
-  public memoState: MemoGameState= {
+  public readonly availableAvatars$: Observable<string[]>;
+  public memoState: MemoGameState = {
     state: [],
     totalMemos: 0,
     currentMemo: 0
   };
-  
-  private board$$ = new BehaviorSubject<string[][]>([]); 
+
+  private board$$ = new BehaviorSubject<string[][]>([]);
   private gameState$$: BehaviorSubject<GameState>;
   private availablePlayerSigns$$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>(['X', 'O', 'J', 'M']);
   private availableAvatars$$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>(AVATARS);
-  
- 
 
-  constructor(private readonly localStorageService: LocalStorageService , private aiMoveService: AiMoveService) { 
-    this.gameState$$ = new BehaviorSubject<GameState>(localStorageService.getItem(GAME_STATE) || INITIAL_STATE);
 
+
+  constructor(private readonly localStorageService: LocalStorageService, private aiMoveService: AiMoveService) {
+    this.gameState$$ = new BehaviorSubject<GameState>(INITIAL_STATE);
+    // this.gameState$$ = new BehaviorSubject<GameState>(localStorageService.getItem(GAME_STATE) || INITIAL_STATE);
     this.board$ = this.board$$.asObservable().pipe(distinctUntilChanged(this.equals));
     this.gameState$ = this.gameState$$.asObservable().pipe(distinctUntilChanged(this.equals));
-    this.availableAvatars$ =  this.availableAvatars$$.asObservable();
+    this.availableAvatars$ = this.availableAvatars$$.asObservable();
 
     this.availablePlayerOneSigns$ = combineLatest([
       this.gameState$$.asObservable().pipe(map((gameState: GameState) => gameState.playerTwoSign)),
@@ -66,7 +66,7 @@ export class GameService {
       this.gameState$$.asObservable().pipe(map((gameState: GameState) => gameState.playerOneSign)),
       this.availablePlayerSigns$$.asObservable()]).pipe(
         map(([playerOneSign, availablePlayerSigns]) => availablePlayerSigns.filter(sign => sign !== playerOneSign))
-      ); 
+      );
   }
 
   public startGame(m: number): void {
@@ -86,10 +86,10 @@ export class GameService {
     };
 
     this.gameState$$.next(newState);
-    this.localStorageService.setItem(GAME_STATE , newState);  
-    
+    this.localStorageService.setItem(GAME_STATE, newState);
+
     this.addMemoState();
-  }; 
+  };
 
   public updateMatrix(squarePosition: SquarePosition): void {
     const state = this.board$$.getValue();
@@ -101,20 +101,20 @@ export class GameService {
     let noMoreRemainingFields
     state[row][column] = activePlayerSign;
 
-    
+
     this.board$$.next(state);
     const updatedBoardState = this.board$$.getValue();
     // We only want to calculate the result if the number of selected fields is bigger then the size of the matrix - 1
     if ((gameState.selectedFields + 1) >= (gameState.matrixOfM * 2) - 1) {
       noMoreRemainingFields = (gameState.selectedFields + 1 === gameState.matrixOfM * gameState.matrixOfM);
       gameWon = this.winConditionMatch(squarePosition, activePlayerSign, gameState.matrixOfM, updatedBoardState);
-      
+
       this.updateGameState({
         activePlayerOne: !activePlayerOne,
         tableState: this.getTableStateText(gameWon, gameState, noMoreRemainingFields),
         selectedFields: gameState.selectedFields + 1,
         gameEnd: gameWon || noMoreRemainingFields,
-        scorePlayerOne: gameWon ? this.newPoints(gameWon, activePlayerOne, gameState.scorePlayerOne): gameState.scorePlayerOne,
+        scorePlayerOne: gameWon ? this.newPoints(gameWon, activePlayerOne, gameState.scorePlayerOne) : gameState.scorePlayerOne,
         scorePlayerTwo: gameWon ? this.newPoints(gameWon, !activePlayerOne, gameState.scorePlayerTwo) : gameState.scorePlayerTwo
       });
     } else {
@@ -127,8 +127,8 @@ export class GameService {
       });
     }
 
-    if(activePlayerOne && !gameState.multiplayer && !gameWon && !noMoreRemainingFields) {
-      const squarePosition = this.aiMoveService.getComputerMove(this.gameState$$.getValue() , this.board$$.getValue()); 
+    if (activePlayerOne && !gameState.multiplayer && !gameWon && !noMoreRemainingFields) {
+      const squarePosition = this.aiMoveService.getComputerMove(this.gameState$$.getValue(), this.board$$.getValue());
       this.updateMatrix(squarePosition);
     }
 
@@ -157,44 +157,44 @@ export class GameService {
 
     this.board$$.next(newState);
   }
- 
-  public undo(): void { 
-    if(this.memoState.state.length > 1) {
-      const oldMemo =  this.memoState.state[this.memoState.currentMemo - 2];
-      if(oldMemo) {
-        this.board$$.next(oldMemo.board);
-        this.gameState$$.next(oldMemo.gameState); 
-        this.memoState.currentMemo = this.memoState.currentMemo - 1;
-      } 
-    } 
-  }
-   
-  public redo(): void {
-    if(this.memoState.state.length > 1) {
-      const newMemo =  this.memoState.state[this.memoState.currentMemo];
-      if(newMemo) {
-        this.board$$.next(newMemo.board);
-        this.gameState$$.next(newMemo.gameState); 
-        this.memoState.currentMemo = this.memoState.currentMemo + 1;
-      } 
-    } 
-  } 
-  
 
-  private addMemoState():void { 
+  public undo(): void {
+    if (this.memoState.state.length > 1) {
+      const oldMemo = this.memoState.state[this.memoState.currentMemo - 2];
+      if (oldMemo) {
+        this.board$$.next(oldMemo.board);
+        this.gameState$$.next(oldMemo.gameState);
+        this.memoState.currentMemo = this.memoState.currentMemo - 1;
+      }
+    }
+  }
+
+  public redo(): void {
+    if (this.memoState.state.length > 1) {
+      const newMemo = this.memoState.state[this.memoState.currentMemo];
+      if (newMemo) {
+        this.board$$.next(newMemo.board);
+        this.gameState$$.next(newMemo.gameState);
+        this.memoState.currentMemo = this.memoState.currentMemo + 1;
+      }
+    }
+  }
+
+
+  private addMemoState(): void {
     this.memoState.state.push({
       board: structuredClone(this.board$$.getValue()),
-      gameState: structuredClone(this.gameState$$.getValue()), 
+      gameState: structuredClone(this.gameState$$.getValue()),
     });
     this.memoState.totalMemos = this.memoState.state.length;
-    this.memoState.currentMemo =  this.memoState.currentMemo + 1; 
+    this.memoState.currentMemo = this.memoState.currentMemo + 1;
   };
 
-  public resetGame():void {
+  public resetGame(): void {
     this.gameState$$.next(INITIAL_STATE);
     this.board$$.next([])
   }
- 
+
   private winConditionMatch = (squarePosition: SquarePosition, activePlayerSign: string, matrixOfM: number, state: any[][]): boolean =>
     this.horizontalMatch(state, squarePosition, activePlayerSign) ||
     this.verticalMatch(state, squarePosition, activePlayerSign) ||
@@ -205,7 +205,7 @@ export class GameService {
   private getTableStateText(gameWon: boolean, gameState: GameState, noMoreRemainingFields: boolean): string {
     const activePlayerWon = gameState.activePlayerOne ? `${gameState.playerOne} Won` : `${gameState.playerTwo} Won`;
     const activePlayerTurn = !gameState.activePlayerOne ? `${gameState.playerOne} Turn` : `${gameState.playerTwo} Turn`;
-    return gameWon ? activePlayerWon: noMoreRemainingFields ? 'It is a draw' : activePlayerTurn;
+    return gameWon ? activePlayerWon : noMoreRemainingFields ? "It's a draw" : activePlayerTurn;
   }
 
   private horizontalMatch = (state: any[][], squarePosition: SquarePosition, activePlayerSign: string): boolean => state[squarePosition.row].every(square => square === activePlayerSign);

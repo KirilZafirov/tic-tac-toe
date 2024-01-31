@@ -20,7 +20,8 @@ export class PlayerComponent {
   @Input() gameEnd!: boolean;
   @Input() availableSigns!: string[];
   @Input() avatars: string[] = [];
-
+  @Input() disabled:boolean = false
+  
   @Output() selectPlayerSign: EventEmitter<string> = new EventEmitter<string>;
   @Output() selectPlayerAvatar: EventEmitter<string> = new EventEmitter<string>;
   @Output() updatePlayerName: EventEmitter<string> = new EventEmitter<string>;
