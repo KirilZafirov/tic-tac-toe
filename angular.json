@@ -71,10 +71,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "tic-tac-toe:build:production"
+              "buildTarget": "tic-tac-toe:build:production"
             },
             "development": {
-              "browserTarget": "tic-tac-toe:build:development"
+              "buildTarget": "tic-tac-toe:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -82,7 +82,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "tic-tac-toe:build"
+            "buildTarget": "tic-tac-toe:build"
           }
         },
         "test": {
