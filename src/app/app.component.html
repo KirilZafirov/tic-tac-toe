@@ -60,10 +60,11 @@
 
     <div *ngIf="board.length > 1">
       <h1>
-        Game State:
+        Game State:{{ gameState.tableState }}
       </h1>
 
-      <h3>{{ gameState.tableState }}</h3>
+      <h3> Score: {{ gameState.playerOne }}:[{{ gameState.scorePlayerOne }}] - {{ gameState.playerTwo }}:[{{
+        gameState.scorePlayerTwo}}]</h3>
     </div>
 
   </ng-container>
