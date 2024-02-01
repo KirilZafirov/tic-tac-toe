@@ -20,10 +20,13 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "tic-tac-toe-minimax"
+            ],
             "outputPath": "docs",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": "",
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
@@ -60,7 +63,7 @@
               "buildOptimizer": false,
               "optimization": false,
               "vendorChunk": true,
-              "extractLicenses": false, 
+              "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
             }
@@ -71,10 +74,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "tic-tac-toe:build:production"
+              "buildTarget": "tic-tac-toe:build:production"
             },
             "development": {
-              "browserTarget": "tic-tac-toe:build:development"
+              "buildTarget": "tic-tac-toe:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -82,14 +85,14 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "tic-tac-toe:build"
+            "buildTarget": "tic-tac-toe:build"
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "main": "src/test.ts",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": "",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
             "assets": [
@@ -106,6 +109,11 @@
     }
   },
   "cli": {
-    "analytics": "8c425a91-9c88-48b1-89f5-312fa016c2ed"
+    "analytics": "8c425a91-9c88-48b1-89f5-312fa016c2ed",
+    "cache": {
+      "enabled": true,
+      "environment": "all",
+      "path": "tmp/cache/.angular"
+    }
   }
 }

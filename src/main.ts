@@ -1,12 +1,16 @@
-import { enableProdMode } from '@angular/core';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { enableProdMode, importProvidersFrom, ɵprovideZonelessChangeDetection } from '@angular/core';
 
-import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
+import { AppComponent } from './app/app.component';
+import { RouterModule } from '@angular/router';
+import { LocalStorageModule } from './app/core/local-storage/frontend-util-storage.module';
+import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 
 if (environment.production) {
   enableProdMode();
 }
 
-platformBrowserDynamic().bootstrapModule(AppModule)
+bootstrapApplication(AppComponent, {
+    providers: [importProvidersFrom(BrowserModule, LocalStorageModule.forRoot(), RouterModule),  ɵprovideZonelessChangeDetection()]
+})
   .catch(err => console.error(err));

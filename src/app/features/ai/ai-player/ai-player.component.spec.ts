@@ -8,8 +8,8 @@ describe('AiPlayerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AiPlayerComponent ]
-    })
+    imports: [AiPlayerComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(AiPlayerComponent);
