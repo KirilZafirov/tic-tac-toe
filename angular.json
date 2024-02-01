@@ -51,6 +51,7 @@
                   "maximumError": "4kb"
                 }
               ],
+              "baseHref": "/tic-tac-toe/",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
