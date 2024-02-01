@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import Minimax from 'tic-tac-toe-minimax'
 import { GameState } from './core/models/game-state.model';
 import { SquarePosition } from './core/models/square.model';
@@ -9,7 +9,7 @@ const { ComputerMove } = Minimax;
 })
 export class AiMoveService { 
   
-  public availableAiDifficulties = ['Easy' , 'Normal' , 'Hard'];
+  public availableAiDifficulties = signal(['Easy' , 'Normal' , 'Hard']);
 
   public difficulty = 'Easy';
   public getComputerMove(gameState: GameState, activeBoard: string[][]) : SquarePosition { 

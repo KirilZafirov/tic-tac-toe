@@ -1,9 +1,8 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, distinctUntilChanged, map, Observable } from 'rxjs';
-import { AiMoveService } from './ai-move.service';
-import { LocalStorageService } from './core/local-storage/local-storage.service';
+import { Injectable, computed, signal } from '@angular/core';
+import { BehaviorSubject , distinctUntilChanged, Observable } from 'rxjs';
+import { AiMoveService } from './ai-move.service'; 
 import { AVATARS } from './core/models/avatars.model';
-import { GameState, GAME_STATE } from './core/models/game-state.model';
+import { GameState } from './core/models/game-state.model';
 import { MemoGameState } from './core/models/memo.model';
 import { SquarePosition } from './core/models/square.model';
 
@@ -22,7 +21,7 @@ const INITIAL_STATE = {
   tableState: 'Player One turn',
   gameEnd: true,
   gameStarted: false,
-  multiplayer: null,
+  multiplayer: true,
   matrixOfM: 0,
 
 }
@@ -32,10 +31,17 @@ const INITIAL_STATE = {
 export class GameService {
 
   public readonly board$: Observable<string[][]>;
-  public readonly gameState$: Observable<GameState>;
-  public readonly availablePlayerOneSigns$: Observable<string[]>;
-  public readonly availablePlayerTwoSigns$: Observable<string[]>;
-  public readonly availableAvatars$: Observable<string[]>;
+  public readonly gameState = signal<GameState>(INITIAL_STATE);
+  public readonly availablePlayerOneSigns = computed(() => {
+    const gameState = this.gameState();
+    return this.availablePlayerSigns().filter(sign => sign !== gameState.playerTwoSign)
+  });
+  public readonly availablePlayerTwoSigns = computed(() => {
+    const gameState = this.gameState();
+    return this.availablePlayerSigns().filter(sign => sign !== gameState.playerOneSign)
+  });
+
+  public readonly availableAvatars = signal<string[]>(AVATARS);
   public memoState: MemoGameState = {
     state: [],
     totalMemos: 0,
@@ -43,57 +49,42 @@ export class GameService {
   };
 
   private board$$ = new BehaviorSubject<string[][]>([]);
-  private gameState$$: BehaviorSubject<GameState>;
-  private availablePlayerSigns$$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>(['X', 'O', 'J', 'M']);
-  private availableAvatars$$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>(AVATARS);
+
+  private availablePlayerSigns = signal<string[]>(['X', 'O', 'J', 'M']);
 
 
 
-  constructor(private readonly localStorageService: LocalStorageService, private aiMoveService: AiMoveService) {
-    this.gameState$$ = new BehaviorSubject<GameState>(INITIAL_STATE);
+
+  constructor(private aiMoveService: AiMoveService) {
+
     // this.gameState$$ = new BehaviorSubject<GameState>(localStorageService.getItem(GAME_STATE) || INITIAL_STATE);
     this.board$ = this.board$$.asObservable().pipe(distinctUntilChanged(this.equals));
-    this.gameState$ = this.gameState$$.asObservable().pipe(distinctUntilChanged(this.equals));
-    this.availableAvatars$ = this.availableAvatars$$.asObservable();
 
-    this.availablePlayerOneSigns$ = combineLatest([
-      this.gameState$$.asObservable().pipe(map((gameState: GameState) => gameState.playerTwoSign)),
-      this.availablePlayerSigns$$.asObservable()]).pipe(
-        map(([playerTwoSign, availablePlayerSigns]) => availablePlayerSigns.filter(sign => sign !== playerTwoSign))
-      );
-
-    this.availablePlayerTwoSigns$ = combineLatest([
-      this.gameState$$.asObservable().pipe(map((gameState: GameState) => gameState.playerOneSign)),
-      this.availablePlayerSigns$$.asObservable()]).pipe(
-        map(([playerOneSign, availablePlayerSigns]) => availablePlayerSigns.filter(sign => sign !== playerOneSign))
-      );
   }
 
   public startGame(m: number): void {
-    this.board$$.next(this.generateMatrix(m));
+    this.board$$.next(this.generateMatrix(m)); 
+    this.gameState.update(oldValue => {
+      const oldStatePlayerTurn = oldValue.activePlayerOne ? `${oldValue.playerOne} Turn` : `${oldValue.playerTwo} Turn`;
+      return {
+        ...oldValue,
+        gameEnd: false,
+        gameStarted: true,
+        activePlayerOne: !oldValue.gameStarted ? oldValue.activePlayerOne : true,
+        selectedFields: 0,
+        tableState: !oldValue.gameStarted ? oldStatePlayerTurn : `${oldValue.playerOne} Turn`,
+        matrixOfM: m
+      }
+    });
 
-    const oldState = this.gameState$$.value;
-    const oldStatePlayerTurn = oldState.activePlayerOne ? `${oldState.playerOne} Turn` : `${oldState.playerTwo} Turn`;
-
-    const newState = {
-      ...oldState,
-      gameEnd: false,
-      gameStarted: true,
-      activePlayerOne: !oldState.gameStarted ? oldState.activePlayerOne : true,
-      selectedFields: 0,
-      tableState: !oldState.gameStarted ? oldStatePlayerTurn : `${oldState.playerOne} Turn`,
-      matrixOfM: m
-    };
-
-    this.gameState$$.next(newState);
-    this.localStorageService.setItem(GAME_STATE, newState);
+    // this.localStorageService.setItem(GAME_STATE, newState);
 
     this.addMemoState();
   };
 
   public updateMatrix(squarePosition: SquarePosition): void {
     const state = this.board$$.getValue();
-    const gameState = this.gameState$$.getValue();
+    const gameState = this.gameState();
     const { row, column } = squarePosition;
     const activePlayerOne = gameState.activePlayerOne;
     const activePlayerSign = activePlayerOne ? gameState.playerOneSign : gameState.playerTwoSign;
@@ -128,7 +119,7 @@ export class GameService {
     }
 
     if (activePlayerOne && !gameState.multiplayer && !gameWon && !noMoreRemainingFields) {
-      const squarePosition = this.aiMoveService.getComputerMove(this.gameState$$.getValue(), this.board$$.getValue());
+      const squarePosition = this.aiMoveService.getComputerMove(this.gameState(), this.board$$.getValue());
       this.updateMatrix(squarePosition);
     }
 
@@ -137,19 +128,16 @@ export class GameService {
   }
 
   public updateGameState(changedState: Partial<GameState>): void {
-    const oldState = this.gameState$$.getValue();
 
-    const newState = {
-      ...oldState,
+    this.gameState.update(oldValue => ({
+      ...oldValue,
       ...changedState
-    };
-
-    this.gameState$$.next(newState);
+    }))
   }
 
   public updateBoardSigns(sign: string, playerOne: boolean): void {
     const oldState = this.board$$.getValue();
-    const { playerOneSign, playerTwoSign } = this.gameState$$.getValue();
+    const { playerOneSign, playerTwoSign } = this.gameState();
 
     const playerSign = playerOne ? playerOneSign : playerTwoSign;
     const signEquals = (columnSign) => (columnSign === playerSign) ? sign : columnSign;
@@ -163,7 +151,7 @@ export class GameService {
       const oldMemo = this.memoState.state[this.memoState.currentMemo - 2];
       if (oldMemo) {
         this.board$$.next(oldMemo.board);
-        this.gameState$$.next(oldMemo.gameState);
+        this.updateGameState(oldMemo.gameState)
         this.memoState.currentMemo = this.memoState.currentMemo - 1;
       }
     }
@@ -174,7 +162,7 @@ export class GameService {
       const newMemo = this.memoState.state[this.memoState.currentMemo];
       if (newMemo) {
         this.board$$.next(newMemo.board);
-        this.gameState$$.next(newMemo.gameState);
+        this.updateGameState(newMemo.gameState)
         this.memoState.currentMemo = this.memoState.currentMemo + 1;
       }
     }
@@ -184,14 +172,14 @@ export class GameService {
   private addMemoState(): void {
     this.memoState.state.push({
       board: structuredClone(this.board$$.getValue()),
-      gameState: structuredClone(this.gameState$$.getValue()),
+      gameState: structuredClone(this.gameState()),
     });
     this.memoState.totalMemos = this.memoState.state.length;
     this.memoState.currentMemo = this.memoState.currentMemo + 1;
   };
 
   public resetGame(): void {
-    this.gameState$$.next(INITIAL_STATE);
+    this.updateGameState(INITIAL_STATE)
     this.board$$.next([])
   }
 

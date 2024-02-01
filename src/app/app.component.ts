@@ -31,10 +31,10 @@ export class AppComponent {
       console.log(board)
     })
   );
-  public readonly gameState$ = this.gameService.gameState$;
-  public readonly availablePlayerOneSigns$ = this.gameService.availablePlayerOneSigns$;
-  public readonly availablePlayerTwoSigns$ = this.gameService.availablePlayerTwoSigns$;
-  public readonly availableAvatars$ = this.gameService.availableAvatars$;
+  public readonly gameState = this.gameService.gameState;
+  public readonly availablePlayerOneSigns = this.gameService.availablePlayerOneSigns;
+  public readonly availablePlayerTwoSigns = this.gameService.availablePlayerTwoSigns;
+  public readonly availableAvatars = this.gameService.availableAvatars;
   public readonly memoState = this.gameService.memoState; 
   public readonly aiDifficulties = this.aiMoveService.availableAiDifficulties; 
 

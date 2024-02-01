@@ -15,7 +15,7 @@ export interface GameState {
   playerTwoSign: string;
   playerOneAvatar: string;
   playerTwoAvatar: string;
-  multiplayer: boolean | null;
+  multiplayer: boolean;
 }
 
 export interface SelectPlayerSign {
