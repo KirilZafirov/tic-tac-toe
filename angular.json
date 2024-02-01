@@ -22,8 +22,8 @@
           "options": {
             "allowedCommonJsDependencies": [
               "tic-tac-toe-minimax"
-            ],
-            "outputPath": "dist/tic-tac-toe",
+           ],
+            "outputPath": "docs",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "",
@@ -63,7 +63,7 @@
               "buildOptimizer": false,
               "optimization": false,
               "vendorChunk": true,
-              "extractLicenses": false,
+              "extractLicenses": false, 
               "sourceMap": true,
               "namedChunks": true
             }
@@ -113,7 +113,7 @@
     "cache": {
       "enabled": true,
       "environment": "all",
-      "path": "tmp/cache/.angular"
-    }
+      "path":"tmp/cache/.angular"
+    } 
   }
 }
