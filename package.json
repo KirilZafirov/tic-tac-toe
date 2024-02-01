@@ -1,6 +1,7 @@
 {
   "name": "tic-tac-toe",
   "version": "0.0.0",
+  "homepage": "https://kirilzafirov.github.io/tic-tac-toe",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
