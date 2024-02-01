@@ -23,7 +23,7 @@
             "allowedCommonJsDependencies": [
               "tic-tac-toe-minimax"
             ],
-            "outputPath": "docs",
+            "outputPath": "dist/tic-tac-toe",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "",
